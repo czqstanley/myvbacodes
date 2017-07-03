@@ -1,0 +1,36 @@
+Sub MySerial()
+    Dim rngSerialLocation As Range
+    Dim intSerialNum As Integer
+    Dim strSerialNum As String
+    Dim docCurrent As Document
+    Dim intNumCopies As Integer
+    Dim intCount As Integer
+
+    ' set ref to current active doc
+    Set docCurrent = Application.ActiveDocument
+    ' set ref to the bookmarked serial number
+    Set rngSerialLocation = docCurrent.Bookmarks("Serial").Range
+
+    ' get the starting number
+    intSerialNum = Val(rngSerialLocation.Text)
+    ' get the number of copies required
+    intNumCopies = Val(InputBox$("How many Copies?", _
+      "Print Serialized", "1"))
+
+    For intCount = 1 To intNumCopies
+        ' print the document
+        docCurrent.PrintOut Range:=wdPrintAllDocument
+        ' increment the serial number
+        intSerialNum = intSerialNum + 1
+        ' put into formatted version
+        strSerialNum = Format(intSerialNum, "00000")
+        ' stuff into proper place
+        rngSerialLocation.Text = strSerialNum
+    Next intCount
+
+    ' reset the bookmark, since the updating procedure
+    ' wipes out the old one
+    docCurrent.Bookmarks.Add Name:="Serial", _
+      Range:=rngSerialLocation
+End Sub
+
