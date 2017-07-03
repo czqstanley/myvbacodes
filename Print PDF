@@ -1,0 +1,28 @@
+Sub Printfile()
+Dim LastRow As Integer
+
+MYFILEOFAC = "J:\SHIPPINGCOMPANIES\1OFAC\"
+MYFILENEG = "J:\SHIPPINGCOMPANIES\NEG\"
+
+LastRow = Range("A" & Rows.Count).End(xlUp).Row
+
+    For I = 2 To LastRow
+        If IsEmpty(Cells(I, 4).Value) = False Then
+        Shell "C:\Program Files\Adobe\Reader 11.0\Reader\AcroRd32.exe /p /h " & MYFILEOFAC & Cells(I, 1).Value & ".PDF"
+        End If
+    
+        If IsEmpty(Cells(I, 5).Value) = False Then
+        Shell "C:\Program Files\Adobe\Reader 11.0\Reader\AcroRd32.exe /p /h " & MYFILENEG & Cells(I, 2).Value & ".PDF"
+        End If
+    
+    Next I
+
+
+    'For j = 2 To LastRow
+    '    If IsEmpty(Cells(j, 5).Value) = False Then
+    '    Shell "C:\Program Files\Adobe\Reader 11.0\Reader\AcroRd32.exe /p /h " & MYFILENEG & Cells(j, 2).Value & ".PDF"
+    'End If
+    
+    'Next j
+
+End Sub
