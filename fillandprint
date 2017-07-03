@@ -1,0 +1,86 @@
+Public Sub Lookback()
+
+    Dim rngSerialLocation1 As Range
+    Dim rngSerialLocation2 As Range
+    Dim rngSerialLocation3 As Range
+    Dim rngSerialLocation4 As Range
+    Dim rngSerialLocation5 As Range
+    Dim rngSerialLocation6 As Range
+    Dim fpath As String
+    
+    Dim intSerialNum As Integer
+    Dim strSerialNum As String
+    Dim docCurrent As Document
+    Dim intNumCopies As Integer
+    Dim intCount As Integer
+
+    ' set ref to current active doc
+    Set docCurrent = Application.Documents("Transaction Risk Mitigation Check List - 11162016")
+    fpath = docCurrent.path
+    
+    ' set ref to the bookmarked serial number
+    Set rngSerialLocation1 = docCurrent.Bookmarks("number").Range
+    Set rngSerialLocation2 = docCurrent.Bookmarks("name").Range
+    Set rngSerialLocation3 = docCurrent.Bookmarks("amount").Range
+    Set rngSerialLocation4 = docCurrent.Bookmarks("price").Range
+    Set rngSerialLocation5 = docCurrent.Bookmarks("pricecheck").Range
+    Set rngSerialLocation6 = docCurrent.Bookmarks("description").Range
+
+    ' get the starting number
+    ' intSerialNum = Val(rngSerialLocation.Text)
+    ' get the number of copies required
+    intNumCopies = Documents("forms").Tables(1).Rows.Count
+    
+    For intCount = 1 To intNumCopies
+        ' increment the serial number
+        ' intSerialNum = intSerialNum + 1
+        ' put into formatted version
+        ' strSerialNum = Format(intSerialNum, "00000")
+   
+        ' stuff into proper place
+        
+        rngSerialLocation1.Text = Documents("forms").Tables(1).Cell(intCount, 1).Range.Text
+        rngSerialLocation2.Text = Documents("forms").Tables(1).Cell(intCount, 2).Range.Text
+        rngSerialLocation3.Text = Documents("forms").Tables(1).Cell(intCount, 3).Range.Text
+        'rngSerialLocation4.Text = Documents("forms").Tables(1).Cell(intCount, 4).Range.Text
+        'rngSerialLocation5.Text = Documents("forms").Tables(1).Cell(intCount, 5).Range.Text
+        'rngSerialLocation6.Text = Documents("forms").Tables(1).Cell(intCount, 6).Range.Text
+        rngSerialLocation1.Text = Left(rngSerialLocation1.Text, Len(rngSerialLocation1.Text) - 1)
+        rngSerialLocation2.Text = Left(rngSerialLocation2.Text, Len(rngSerialLocation2.Text) - 1)
+        rngSerialLocation3.Text = Left(rngSerialLocation3.Text, Len(rngSerialLocation3.Text) - 1)
+
+        
+        rngSerialLocation1.Underline = True
+        rngSerialLocation2.Underline = True
+        rngSerialLocation3.Underline = True
+        'rngSerialLocation4.Underline = True
+        'rngSerialLocation4.Font.Size = 9
+        'rngSerialLocation4.ParagraphFormat.Alignment = wdAlignParagraphLeft
+        'rngSerialLocation5.Underline = True
+        'rngSerialLocation5.Font.Size = 9
+        'rngSerialLocation5.ParagraphFormat.Alignment = wdAlignParagraphLeft
+        'rngSerialLocation6.Underline = True
+        'rngSerialLocation6.Font.Size = 9
+        'rngSerialLocation6.ParagraphFormat.Alignment = wdAlignParagraphLeft
+                
+        sfilename1 = rngSerialLocation1.Text
+        sfilename2 = rngSerialLocation2.Text
+        'sfilename3 = " Vessel Check"
+        'sfilename4 = " high risk country"
+   
+        savename = "C:\Users\ZQCHEN\Desktop\lookbackpages\" & sfilename1 & " " & sfilename2
+        
+        ' print the document
+        docCurrent.PrintOut Range = printalldocument
+        docCurrent.SaveAs2 Filename:=savename, fileformat:=wdFormatDocument
+        
+                
+    Next intCount
+
+    ' reset the bookmark, since the updating procedure
+    ' wipes out the old one
+
+End Sub
+
+
+
