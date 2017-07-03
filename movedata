@@ -75,3 +75,199 @@ End Sub
 
 
 
+Sub movedataover()
+
+
+'count file numbers
+d = 1
+Do Until IsEmpty(Cells(d, 1).Value) = True
+d = d + 1
+Loop
+d = d - 1
+
+Dim senario() As String
+Dim reviewer() As String
+Dim dates() As Date
+Dim disposition() As String
+
+ReDim senario(d)
+ReDim dates(d)
+ReDim reviewer(d)
+ReDim disposition(d)
+
+Dim sourcenames() As String
+ReDim sourcenames(d)
+For i = 1 To d
+sourcenames(i) = Cells(i, 1).Value
+Next
+
+Application.EnableEvents = False
+Application.ScreenUpdating = False
+
+
+For l = 1 To d
+sFname = sourcenames(l)
+sPath = ThisWorkbook.Path
+ChDir sPath
+sFname = Dir(sPath & "\" & sourcenames(l) & ".xl*", vbNormal)
+Set wbk = Workbooks.Open(sFname)
+Windows(sFname).Activate
+Worksheets("sheet1").Activate
+
+senario(l) = Cells(2, 2).Value
+reviewer(l) = Cells(3, 2).Value
+
+m = 1
+Do Until Cells(m, 1).Value = "Disposition"
+m = m + 1
+Loop
+
+disposition(l) = Cells(m + 1, 1).Value
+
+
+Windows(sFname).Activate
+Workbooks(sFname).Close
+
+Next
+
+For J = 1 To d
+
+Cells(J, 2).Value = senario(J)
+Cells(J, 3).Value = dates(J)
+Cells(J, 4).Value = reviewer(J)
+Cells(J, 5).Value = disposition(J)
+
+Next
+
+Columns(2).ColumnWidth = 100
+Columns(2).WrapText = True
+Columns(5).ColumnWidth = 100
+Columns(5).WrapText = True
+
+End Sub
+
+
+Sub writedispositions()
+
+c = 1
+Do Until IsEmpty(Cells(c, 1)) = True
+c = c + 1
+Loop
+c = c - 1
+
+For i = 1 To c
+
+If InStr("Discrepancies in Vessel or Shipment Information", Cells(i, 1)) > 0 Then
+
+Cells(i, 2).Value = Cells(1, 9).Value
+
+End If
+
+Next
+
+
+End Sub
+
+
+
+Sub writefile()
+Dim filenames As String
+Dim dispositions() As String
+
+'column of disposition description
+'a = InputBox("From which column does the disposition start? Need a number")
+a = 8
+b = 1
+
+Do Until IsEmpty(Cells(b, 8).Value) = True
+b = b + 1
+Loop
+b = b - 1
+
+ReDim dispositions(b, 2)
+
+For J = 1 To b
+dispositions(J, 1) = Cells(J, a).Value
+dispositions(J, 2) = Cells(J, a + 1).Value
+Next J
+
+c = 1
+Do Until IsEmpty(Cells(c, 1)) = True
+c = c + 1
+Loop
+c = c - 1
+
+For i = 1 To c
+
+d = 1
+
+filenames = Cells(i, 1).Value
+
+    Do While InStr(filenames, dispositions(d, 1)) <> 1
+    d = d + 1
+    Loop
+    d = d - 1
+    
+    Cells(i, 2).Value = dispositions(d, 2)
+    
+
+Next i
+
+End Sub
+
+
+Sub Manageworkbooks()
+    Dim sPath As String
+    Dim sFname As String
+    Dim wBk As Workbook
+    Dim wSht As Variant
+    Dim J As Integer
+    J = 0
+    Dim k As Integer
+    k = 1
+    
+    sPath = "C:\Users\ZQCHEN\Desktop\New folder (3)"
+    ChDir sPath
+    Dim NEWWKB As Workbook
+    Dim newfilename As String
+    Set NEWWKB = Workbooks.Add
+    newfilename = InputBox("save as?")
+    NEWWKB.SaveAs (sPath & "\" & newfilename & ".xlsx")
+       
+
+    Application.EnableEvents = False
+    Application.ScreenUpdating = False
+    sFname = "Discrepancies in Vessel or Shipment Information 1000048"
+    sFname = Dir(sPath & "\" & sFname & ".xl*", vbNormal)
+    Set wBk = Workbooks.Open(sFname)
+    Windows(sFname).Activate
+    Worksheets("sheet1").Activate
+        Do Until IsEmpty(Cells(J, 1).Value) = True
+        J = J + 1
+        Loop
+    
+    Dim data() As String, size1 As Integer
+    size1 = J
+    ReDim data(size1)
+    For r = 1 To J
+    data(J) = Cells(J, 1)
+    Next
+    
+    MsgBox (data(1))
+    
+    
+    Windows(newfilename).Activate
+    Worksheets("sheet1").Activate
+    For n = 1 To J
+    Cells(J + 10, 1).Value = data(J)
+    Next
+    
+   
+    Windows(sFname).Activate
+    ActiveWorkbook.Save
+    ActiveWorkbook.Close
+
+End Sub
+
+                     
+        
