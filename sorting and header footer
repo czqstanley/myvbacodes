@@ -1,0 +1,181 @@
+Sub addheaderandfooter()
+Application.ScreenUpdating = False
+
+Dim customername As String
+Dim CUSTOMERID As String
+Dim reviewperiod1 As String
+Dim reviewperiod2 As String
+Dim header As String
+Dim line1 As String
+Dim line2 As String
+
+customername = ThisWorkbook.Worksheets("basic info").Cells(2, 2)
+CUSTOMERID = ThisWorkbook.Worksheets("basic info").Cells(1, 2)
+reviewperiod1 = Application.WorksheetFunction.Text(WorksheetFunction.EoMonth(Date - 395, 0) + 1, "mmmm,d,yyyy")
+reviewperiod2 = Application.WorksheetFunction.Text(WorksheetFunction.EoMonth(Date - 30, 0), "mmmm,d,yyyy")
+
+line1 = customername & ", Customer ID " & CUSTOMERID
+line2 = "Review Period: " & reviewperiod1 & " - " & reviewperiod2
+
+ThisWorkbook.Worksheets("Banking Transaction Data").PageSetup.CenterHeader = line1 & Chr(13) & "Banking Activities " & line2
+ThisWorkbook.Worksheets("Banking Transaction Data").PageSetup.CenterFooter = "Page &P" & " of " & "&N"
+ThisWorkbook.Worksheets("Banking Transaction Data").PageSetup.PrintTitleRows = ThisWorkbook.Worksheets("Banking Transaction Data").Rows(1).Address
+
+ThisWorkbook.Worksheets("Advising").PageSetup.CenterHeader = line1 & Chr(13) & "Advising Activities " & line2
+ThisWorkbook.Worksheets("Advising").PageSetup.CenterFooter = "Page &P" & " of " & "&N"
+ThisWorkbook.Worksheets("Advising").PageSetup.PrintTitleRows = ThisWorkbook.Worksheets("Advising").Rows(1).Address
+
+ThisWorkbook.Worksheets("Drawing").PageSetup.CenterHeader = line1 & Chr(13) & "Drawing Activities " & line2
+ThisWorkbook.Worksheets("Drawing").PageSetup.CenterFooter = "Page &P" & " of " & "&N"
+ThisWorkbook.Worksheets("Drawing").PageSetup.PrintTitleRows = ThisWorkbook.Worksheets("Drawing").Rows(1).Address
+
+ThisWorkbook.Worksheets("Outward Collection").PageSetup.CenterHeader = line1 & Chr(13) & "Outward Collection Activities " & line2
+ThisWorkbook.Worksheets("Outward Collection").PageSetup.CenterFooter = "Page &P" & " of " & "&N"
+ThisWorkbook.Worksheets("Outward Collection").PageSetup.PrintTitleRows = ThisWorkbook.Worksheets("Outward Collection").Rows(1).Address
+
+ThisWorkbook.Worksheets("Inward Collection").PageSetup.CenterHeader = line1 & Chr(13) & "Inward Collection Activities " & line2
+ThisWorkbook.Worksheets("Inward Collection").PageSetup.CenterFooter = "Page &P" & " of " & "&N"
+ThisWorkbook.Worksheets("Inward Collection").PageSetup.PrintTitleRows = ThisWorkbook.Worksheets("Inward Collection").Rows(1).Address
+
+ThisWorkbook.Worksheets("Standby LC").PageSetup.CenterHeader = line1 & Chr(13) & "Standby LC Activities " & line2
+ThisWorkbook.Worksheets("Standby LC").PageSetup.CenterFooter = "Page &P" & " of " & "&N"
+ThisWorkbook.Worksheets("Standby LC").PageSetup.PrintTitleRows = ThisWorkbook.Worksheets("Standby LC").Rows(1).Address
+
+ThisWorkbook.Worksheets("Analysis").PageSetup.CenterHeader = line1 & Chr(13) & "Transaction Analysis " & line2
+ThisWorkbook.Worksheets("Analysis").PageSetup.CenterFooter = "Page &P" & " of " & "&N"
+ThisWorkbook.Worksheets("Analysis").PageSetup.PrintTitleRows = ThisWorkbook.Worksheets("Analysis").Rows(1).Address
+
+ThisWorkbook.Worksheets("Commercial LC").PageSetup.CenterHeader = line1 & Chr(13) & "Transaction Analysis " & line2
+ThisWorkbook.Worksheets("Commercial LC").PageSetup.CenterFooter = "Page &P" & " of " & "&N"
+ThisWorkbook.Worksheets("Commercial LC").PageSetup.PrintTitleRows = ThisWorkbook.Worksheets("Commercial LC").Rows(1).Address
+
+Application.ScreenUpdating = True
+
+End Sub
+
+
+Sub clearheaderandfooter()
+Application.ScreenUpdating = False
+
+Dim ws As Worksheet
+Application.ScreenUpdating = False
+For Each ws In ThisWorkbook.Worksheets
+With ws.PageSetup
+.CenterHeader = ""
+.CenterFooter = ""
+End With
+Set ws = Nothing
+
+Next
+
+Application.ScreenUpdating = True
+
+End Sub
+
+
+Sub sorttransactions()
+Application.ScreenUpdating = False
+
+'Define general parameters
+Dim LastRow As Long
+Dim i As Long, j As Long, k As Long
+Dim CUSTOMERID As Long
+CUSTOMERID = InputBox("Customer ID is?")
+
+'Define Worksheet names and worksheets
+Dim sourcesheets(3) As Worksheet
+Dim targetsheets(3) As Worksheet
+Set sourcesheets(1) = Worksheets("enquiryadvising")
+Set sourcesheets(2) = Worksheets("enquirydrawing")
+Set sourcesheets(3) = Worksheets("enquiryothers")
+Set targetsheets(1) = Worksheets("advising")
+Set targetsheets(2) = Worksheets("drawing")
+Set targetsheets(3) = Worksheets("others")
+
+   
+   For k = 1 To 3
+   'Find the last used row in a Column: column A in this example
+   With sourcesheets(k)
+      LastRow = .Cells(.Rows.Count, "A").End(xlUp).Row
+   End With
+
+   'first row number where you need to paste values in Sheet1'
+   With targetsheets(k)
+      j = .Cells(.Rows.Count, "A").End(xlUp).Row + 1
+   End With
+
+
+   sourcesheets(k).Rows(1).Copy Destination:=targetsheets(k).Range("A" & 1)
+               
+   For i = 1 To LastRow
+       With sourcesheets(k)
+           If .Cells(i, 3).value = CUSTOMERID Then
+               .Rows(i).Copy Destination:=targetsheets(k).Range("A" & j)
+               j = j + 1
+           End If
+       End With
+   Next i
+        
+   Next k
+   
+   
+   Application.ScreenUpdating = True
+   
+End Sub
+
+
+Sub sortothers()
+Application.ScreenUpdating = False
+
+'Define general parameters
+Dim LastRow As Long
+Dim i As Long, j As Long, k As Long
+Dim CUSTOMERID As Long
+'CUSTOMERID = InputBox("Customer ID is?")
+
+'Define Worksheet names and worksheets
+Dim sourcesheets As Worksheet
+Dim targetsheets(4) As Worksheet
+Dim strings(4) As String
+Set sourcesheets = Worksheets("others")
+Set targetsheets(1) = Worksheets("Outward Collection")
+strings(1) = "EC"
+Set targetsheets(2) = Worksheets("Inward Collection")
+strings(2) = "IC"
+Set targetsheets(3) = Worksheets("Standby LC")
+strings(3) = "SB"
+Set targetsheets(4) = Worksheets("Commercial LC")
+strings(4) = "CM"
+
+
+   'Find the last used row in a Column: column A in this example
+   With sourcesheets
+      LastRow = .Cells(.Rows.Count, "A").End(xlUp).Row
+   End With
+   
+   
+   For k = 1 To 4
+   'first row number where you need to paste values in Sheet1'
+   With targetsheets(k)
+      j = .Cells(.Rows.Count, "A").End(xlUp).Row + 1
+   End With
+
+
+   sourcesheets.Rows(1).Copy Destination:=targetsheets(k).Range("A" & 1)
+               
+   For i = 1 To LastRow
+       With sourcesheets
+           If InStr(1, .Cells(i, 2), strings(k)) > 0 Then
+               .Rows(i).Copy Destination:=targetsheets(k).Range("A" & j)
+               j = j + 1
+           End If
+       End With
+   Next i
+        
+   Next k
+   
+   Application.ScreenUpdating = True
+End Sub
+
+
+
