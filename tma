@@ -1,0 +1,85 @@
+Sub Manageworkbooks()
+    Dim sPath As String
+    Dim sFname As String
+    Dim wBk As Workbook
+    Dim wSht As Variant
+    Dim A1 As String
+    Dim A2 As String
+    Dim A3 As String
+    Dim A4 As String
+    Dim B3 As String
+    Dim B4 As Date
+    Dim a12 As String
+    Dim f12 As String
+    Dim J As Integer
+    J = 1
+    Dim k As Integer
+    k = 1
+    
+    Do Until IsEmpty(Cells(J, 1).Value) = True
+    J = J + 1
+    Loop
+    
+    J = J - 1
+    A1 = "CASE NO."
+    A2 = "SCENARIO"
+    A3 = "REVIEWER"
+    A4 = "DATE ASSIGNED"
+    B3 = InputBox("REVIEWER")
+    B4 = Date
+    a12 = "Disposition"
+    f12 = "DATE:" & Date
+    
+    BASE = InputBox("format as 1701000")
+    Dim casenumber() As String
+    ReDim casenumber(J)
+    For i = 1 To J
+    CT = BASE + i
+    casenumber(i) = "LA" & CT
+    Next
+    
+    
+    Dim FILENAMES() As Variant
+    ReDim FILENAMES(J)
+    For i = 1 To J
+    FILENAMES(i) = Cells(i, 1).Value
+    Next
+    
+    Application.EnableEvents = False
+    Application.ScreenUpdating = False
+    sPath = InputBox("filelocation")
+    ChDir sPath
+    For i = 1 To J
+    sFname = FILENAMES(i)
+    sFname = Dir(sPath & "\" & sFname & ".xl*", vbNormal)
+    Set wBk = Workbooks.Open(sFname)
+    Windows(sFname).Activate
+    Worksheets("sheet1").Activate
+        Rows("1:4").EntireRow.Insert
+        Rows("1:4").Interior.ColorIndex = 6
+        Cells(1, 1).Value = A1
+        Cells(2, 1).Value = A2
+        Cells(3, 1).Value = A3
+        Cells(4, 1).Value = A4
+        Cells(1, 2).Value = casenumber(i)
+        Cells(3, 2).Value = B3
+        Cells(4, 2).Value = B4
+        
+        Do Until IsEmpty(Cells(k, 1).Value) = True
+        k = k + 1
+        Loop
+        Cells(k + 1, 1).Value = a12
+        Cells(k + 1, 5).Value = f12
+        Rows(k + 1).Interior.ColorIndex = 6
+        With Range(Cells(k + 2, 1), Cells(k + 8, 5))
+        .Merge
+        .WrapText = True
+        .HorizontalAlignment = xlLeft
+        .VerticalAlignment = xlTop
+        End With
+        
+           
+   ActiveWorkbook.Save
+   ActiveWorkbook.Close
+   Next
+End Sub
