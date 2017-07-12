@@ -1,0 +1,39 @@
+Sub CreatPT()
+Dim sws As Worksheet
+Dim tws As Worksheet
+Dim pvt As PivotTable
+Dim pvtc As PivotCache
+Dim source As Range
+Dim target As Range
+
+sName = ActiveSheet.Name
+Set sws = Worksheets(sName)
+Set source = sws.UsedRange
+
+Set tws = Worksheets.Add
+Set target = tws.Cells(3, 1)
+
+Set pvtc = ActiveWorkbook.PivotCaches.Create(SourceType:=xlDatabase, SourceData:=source)
+Set pvt = pvtc.CreatePivotTable(Tabledestination:=target, TableName:="TB1")
+
+
+With pvt.PivotFields("Book Date")
+    .Orientation = xlRowField
+End With
+
+With pvt.PivotFields("Recv/Pay")
+    .Orientation = xlRowField
+End With
+
+pvt.AddDataField pvt.PivotFields("Amount"), "Total", xlSum
+pvt.AddDataField pvt.PivotFields("amount"), "Average", xlAverage
+pvt.AddDataField pvt.PivotFields("Amount"), "Max", xlMax
+pvt.AddDataField pvt.PivotFields("Amount"), "Min", xlMin
+pvt.DataBodyRange.NumberFormat = "$#,##0.00"
+pvt.AddDataField pvt.PivotFields("Amount"), "Count", xlCount
+
+Set dt = pvt.PivotFields("Book Date").DataRange
+dt.Cells(1).Group Periods:=Array(False, False, False, False, True, False, True)
+
+
+End Sub
