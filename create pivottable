@@ -26,14 +26,14 @@ With pvt.PivotFields("Recv/Pay")
 End With
 
 With pvt.PivotFields("Type")
-    .Orientation = xlHidden
+    .Orientation = xlPageField
 End With
  
 Dim pf As PivotField
 Set pf = pvt.PivotFields("Type")
 pf.EnableMultiplePageItems = True
 
-pf.PivotItems("216").Visible = False
+pf.PivotItems("216").Visible = True
 pf.PivotItems("206").Visible = False
 
 Set dt = pvt.PivotFields("Book Date").DataRange
@@ -49,3 +49,4 @@ pvt.DataFields(5).NumberFormat = "0"
 
 
 End Sub
+
