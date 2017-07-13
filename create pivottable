@@ -36,8 +36,8 @@ pf.EnableMultiplePageItems = True
 pf.PivotItems("216").Visible = False
 pf.PivotItems("206").Visible = False
 
- 
-'pvt.PivotFields("Recv/Pay").PivotFilters.Add Type:=xlValueEquals, Value1:="Receive"
+Set dt = pvt.PivotFields("Book Date").DataRange
+dt.Cells(1).Group Periods:=Array(False, False, False, False, True, False, True)
 
 pvt.AddDataField pvt.PivotFields("Amount"), "Total", xlSum
 pvt.AddDataField pvt.PivotFields("amount"), "Average", xlAverage
@@ -45,12 +45,7 @@ pvt.AddDataField pvt.PivotFields("Amount"), "Max", xlMax
 pvt.AddDataField pvt.PivotFields("Amount"), "Min", xlMin
 pvt.DataBodyRange.NumberFormat = "$#,##0.00"
 pvt.AddDataField pvt.PivotFields("Amount"), "Count", xlCount
-
-Set dt = pvt.PivotFields("Book Date").DataRange
-dt.Cells(1).Group Periods:=Array(False, False, False, False, True, False, True)
-
+pvt.DataFields(5).NumberFormat = "0"
 
 
 End Sub
-
-
