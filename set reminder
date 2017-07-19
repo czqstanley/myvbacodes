@@ -1,0 +1,15 @@
+ Sub StoreReminders()
+    Dim appOL As Object
+     Dim objReminder As Object
+     
+    Set appOL = GetObject(, "Outlook.application")
+     Set objReminder = appOL.CreateItem(1) ' olAppointmentItem
+     
+     objReminder.Start = Range("a1") ' date
+     objReminder.Duration = Range("b1") ' time
+     objReminder.Subject = Range("c1") ' subject text
+     objReminder.RequiredAttendees = Range("d1") 'email
+     objReminder.OptionalAttendees = Range("e1") 'email
+     objReminder.ReminderSet = True
+     objReminder.Save
+End Sub
