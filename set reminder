@@ -34,7 +34,9 @@ swb.Close
     Set appOL = GetObject(, "Outlook.application")
     Set objReminder = appOL.CreateItem(1) ' olAppointmentItem
     objReminder.MeetingStatus = olMeeting
-    objReminder.Start = a(j) ' date
+    objReminder.AllDayEvent = True
+    objReminder.Start = a(j)
+    objReminder.End = a(j)
     objReminder.Duration = b(j) ' time
     objReminder.Subject = c(j) ' subject text
     objReminder.RequiredAttendees = d(j) 'email
