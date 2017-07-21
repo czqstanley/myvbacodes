@@ -1,15 +1,50 @@
- Sub StoreReminders()
+Sub testopen()
+Dim XlApp As Object
+
+
+Set XlApp = CreateObject("Excel.Application")
+
+Dim filepath As String
+filepath = "C:\Users\ZQCHEN\Documents\Book1.xlsx"
+
+With XlApp
+    .Visible = True
+End With
+
+Set swb = XlApp.Workbooks.Open(filepath)
+swb.Activate
+Set sws = Worksheets("sheet1")
+Dim a, b, c, d
+nrow = sws.UsedRange.Rows.Count
+ReDim a(nrow), b(nrow), c(nrow), d(nrow)
+
+For i = 1 To nrow
+a(i) = Cells(i, 1).Value
+b(i) = Cells(i, 2).Value
+c(i) = Cells(i, 3).Value
+d(i) = Cells(i, 4).Value
+Next i
+
+
+swb.Close
+
     Dim appOL As Object
-     Dim objReminder As Object
-     
+    Dim objReminder As Object
+    For j = 1 To nrow
     Set appOL = GetObject(, "Outlook.application")
-     Set objReminder = appOL.CreateItem(1) ' olAppointmentItem
-     
-     objReminder.Start = Range("a1") ' date
-     objReminder.Duration = Range("b1") ' time
-     objReminder.Subject = Range("c1") ' subject text
-     objReminder.RequiredAttendees = Range("d1") 'email
-     objReminder.OptionalAttendees = Range("e1") 'email
-     objReminder.ReminderSet = True
-     objReminder.Save
+    Set objReminder = appOL.CreateItem(1) ' olAppointmentItem
+    objReminder.MeetingStatus = olMeeting
+    objReminder.Start = a(j) ' date
+    objReminder.Duration = b(j) ' time
+    objReminder.Subject = c(j) ' subject text
+    objReminder.RequiredAttendees = d(j) 'email
+    'objReminder.OptionalAttendees = Range("e1") 'email
+    'objReminder.Recipients.Add Cells("d1")
+    objReminder.ReminderSet = True
+           
+    objReminder.Save
+    'objReminder.Display
+    objReminder.Send
+    Next j
+    
 End Sub
