@@ -1,0 +1,88 @@
+Sub CreatPTDrawing()
+Dim hrstates As Variant
+Dim hrc()
+Set hr = Worksheets("High Risk Countries")
+a = hr.UsedRange.Rows.Count
+ReDim hrc(a)
+For i = 3 To a
+hrc(i) = Cells(i, 2).value
+Next
+
+Dim sws As Worksheet
+Dim tws As Worksheet
+Dim pvt As PivotTable
+Dim pvtc As PivotCache
+Dim source As Range
+Dim target As Range
+
+Set sws = Worksheets("Drawing")
+Set source = sws.UsedRange
+
+Set tws = Worksheets.Add
+tws.Name = "Drawing High Risk"
+Set target = tws.Cells(3, 1)
+
+Set pvtc = ActiveWorkbook.PivotCaches.Create(SourceType:=xlDatabase, SourceData:=source)
+Set pvt = pvtc.CreatePivotTable(Tabledestination:=target, TableName:="TB1")
+
+
+With pvt.PivotFields("Country")
+    .Orientation = xlRowField
+End With
+
+pvt.AddDataField pvt.PivotFields("Amount"), "Total", xlSum
+pvt.DataBodyRange.NumberFormat = "$#,##0.00"
+pvt.AddDataField pvt.PivotFields("Amount"), "Count", xlCount
+pvt.DataFields(2).NumberFormat = "0"
+
+Set pf = pvt.PivotFields("Country")
+
+For Each PivotItems In pf.PivotItems
+    PivotItems.Visible = Not IsError(Application.Match(PivotItems.Name, hr.Columns(2), 0))
+Next
+
+End Sub
+
+Sub CreatPTOther()
+Dim hrstates As Variant
+Dim hrc()
+Set hr = Worksheets("High Risk Countries")
+a = hr.UsedRange.Rows.Count
+ReDim hrc(a)
+For i = 3 To a
+hrc(i) = Cells(i, 2).value
+Next
+Dim sws As Worksheet
+Dim tws As Worksheet
+Dim pvt As PivotTable
+Dim pvtc As PivotCache
+Dim source As Range
+Dim target As Range
+
+Set sws = Worksheets("Others")
+Set source = sws.UsedRange
+
+Set tws = Worksheets.Add
+tws.Name = "Other High Risk"
+Set target = tws.Cells(3, 1)
+
+Set pvtc = ActiveWorkbook.PivotCaches.Create(SourceType:=xlDatabase, SourceData:=source)
+Set pvt = pvtc.CreatePivotTable(Tabledestination:=target, TableName:="TB1")
+
+
+With pvt.PivotFields("Origin")
+    .Orientation = xlRowField
+End With
+
+pvt.AddDataField pvt.PivotFields("Amount"), "Total", xlSum
+pvt.DataBodyRange.NumberFormat = "$#,##0.00"
+pvt.AddDataField pvt.PivotFields("Amount"), "Count", xlCount
+pvt.DataFields(2).NumberFormat = "0"
+
+Set pf = pvt.PivotFields("Origin")
+
+For Each PivotItems In pf.PivotItems
+    PivotItems.Visible = Not IsError(Application.Match(PivotItems.Name, hr.Columns(2), 0))
+Next
+
+End Sub
