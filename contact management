@@ -1,0 +1,38 @@
+Sub readcontacts()
+I = 1
+Dim olApp As Object
+
+Set olApp = GetObject(, "outlook.application")
+Set olContactsFolder = session.getdefaultfolder(olFolderContacts)
+
+For Each CItem In olContactsFolder.Items
+    If Not CItem.Class = olDistributionList Then
+    Cells(I, 1).Value = CItem.EntryID
+    Cells(I, 2).Value = CItem.FullName
+    Cells(I, 3).Value = CItem.FirstName
+    Cells(I, 4).Value = CItem.LastName
+    Cells(I, 5).Value = CItem.Email1Address
+    I = I + 1
+    End If
+Next
+
+End Sub
+
+
+Sub rewritecontacts()
+I = 1
+Dim olApp As Object
+
+Set olApp = GetObject(, "outlook.application")
+Set olContactsFolder = session.getdefaultfolder(olFolderContacts)
+
+For Each CItem In olContactsFolder.Items
+    If CItem.EntryID = Cells(I, 1).Value Then
+    CItem.FullName = Cells(I, 2).Value
+    CItem.FirstName = Cells(I, 3).Value
+    CItem.LastName = Cells(I, 4).Value
+    CItem.Save
+    I = I + 1
+    End If
+Next
+End Sub
