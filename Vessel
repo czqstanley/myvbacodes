@@ -1,0 +1,272 @@
+Sub MAERSKSEARCH()
+For I = 1 To 20
+    LINK = "https://my.maerskline.com/tracking/search?searchNumber="
+    Dim BLNUMBER As String
+    BLNUMBER = Cells(I, 2).Value
+    BLNUMBER = Trim(Right(BLNUMBER, Len(BLNUMBER) - 4))
+
+    Dim HtmlDoc As New HTMLDocument
+    With CreateObject("MSXML2.XMLHTTP")
+         .Open "GET", LINK & BLNUMBER, False
+         .Send
+    Application.Wait (Now + #12:00:10 AM#)
+         GETHTML = .responsetext
+    End With
+    HtmlDoc.body.innerHTML = GETHTML
+    'save file
+    Set fso = CreateObject("scripting.filesystemobject")
+    Set tf = fso.createtextfile("C:\Users\ZQCHEN\Desktop\VESSEL\" & Cells(I, 1).Value & ".htm", True)
+    tf.write HtmlDoc.body.innerHTML
+        
+
+    Dim ITM As IHTMLElement
+    For Each ITM In HtmlDoc.getElementsByTagName("td")
+
+        If InStr(1, Left(ITM.innerText, 1024), "ETA") <> 0 Then
+        Arrival = Left(ITM.innerText, 1024)
+        End If
+        
+        If InStr(1, Left(ITM.innerText, 1024), "days ago at") <> 0 Then
+        discharge = ITM.innerText
+        End If
+        
+        
+        Cells(I, 3).Value = Arrival & "Current Status: " & discharge & "; Checked on " & Date
+        
+    Next
+Next
+
+    Application.Wait (Now + #12:00:10 AM#)
+    
+End Sub
+
+
+
+
+Sub EVERGREENSEARCH()
+'For I = 1 To 5
+    LINK1 = "https://www.yangming.com/e-service/track_trace/blconnect.aspx?BLADG="
+    LINK2 = ",&rdolType=BL&type=cargo"
+    Dim BLNUMBER As String
+    BLNUMBER = Cells(I, 1).Value
+    BLNUMBER = Trim(Right(BLNUMBER, Len(BLNUMBER) - 4))
+    MsgBox ((BLNUMBER))
+
+
+    Dim HtmlDoc As New HTMLDocument
+    With CreateObject("MSXML2.XMLHTTP")
+         .Open "GET", LINK1 & BLNUMBER & LINK2, False
+         .Send
+    'Application.Wait (Now + #12:00:10 AM#)
+         GETHTML = .responsetext
+    End With
+    HtmlDoc.body.innerHTML = GETHTML
+
+    Dim ITM As IHTMLElement
+    For Each ITM In HtmlDoc.getElementsByTagName("td")
+ 
+        'If InStr(1, Left(itm.children. 1024), "ETA") <> 0 Then
+        Cells(I, 2).Value = Left(ITM.innerText, 1024)
+        End If
+    Next
+'Next
+
+    'Application.Wait (Now + #12:00:10 AM#)
+    
+End Sub
+
+
+
+Sub APLSEARCH()
+'For I = 1 To 5
+'    Dim LINK As String
+
+I = 1
+
+    LINK = "http://homeport.apl.com/gentrack/trackingMain.do?trackInput01="
+    Dim BLNUMBER As String
+    BLNUMBER = Cells(I, 1).Value
+    BLNUMBER = Right(BLNUMBER, Len(BLNUMBER) - 4)
+MsgBox ((BLNUMBER))
+
+
+    Dim HtmlDoc As New HTMLDocument
+    With CreateObject("MSXML2.XMLHTTP")
+         .Open "GET", LINK & BLNUMBER, False
+         .Send
+         GETHTML = .responsetext
+    Cells(10, 1) = GETHTML
+    
+    End With
+    HtmlDoc.body.innerHTML = GETHTML
+
+    'Dim itm As IHTMLElement
+    'For Each itm In HtmlDoc.getElementsByTagName("td")
+    '    If InStr(1, Left(itm.innerText, 1024), "ETA") <> 0 Then
+    '    Cells(I, 2).VALUE = Left(itm.innerText, 1024)
+    '    End If
+    'Next
+    
+'Application.Wait Now + #12:00:10 AM#
+'Next
+
+End Sub
+
+
+Sub CMACGMSEARCH()
+Dim strings() As String
+For I = 1 To 32
+K = 1
+x = 1
+
+    LINK1 = "https://www.cma-cgm.com/ebusiness/tracking/search?SearchBy=Booking&Reference="
+    LINK2 = "&search=Search"
+    Dim BLNUMBER As String
+    BLNUMBER = Cells(I, 2).Value
+    
+    Dim HtmlDoc As New HTMLDocument
+    With CreateObject("MSXML2.XMLHTTP")
+         .Open "GET", LINK1 & BLNUMBER & LINK2, False
+         .Send
+    Application.Wait (Now + #12:00:05 AM#)
+         GETHTML = .responsetext
+    End With
+    HtmlDoc.body.innerHTML = GETHTML
+
+    'save file
+    Set fso = CreateObject("scripting.filesystemobject")
+    Set tf = fso.createtextfile("C:\Users\ZQCHEN\Desktop\VESSEL\" & Cells(I, 1).Value & ".htm", True)
+    tf.write HtmlDoc.body.innerHTML
+
+    Dim ITM As IHTMLElement
+    Set ITMCOLLECTION = HtmlDoc.getElementsByTagName("td")
+    num = ITMCOLLECTION.Length
+    Group = num / 9
+    
+    ReDim strings(num)
+   
+    For Each ITM In HtmlDoc.getElementsByTagName("td")
+        strings(K) = ITM.innerText
+        'Cells(k, 5).Value = strings(k)
+        K = K + 1
+    Next
+    results = ""
+    Final = ""
+    For l = 1 To Group
+        For m = 1 To 9
+            results = results & ", " & strings(x)
+            x = x + 1
+        Next
+            Final = Final & "," & Right(results, Len(results) - 1) & Chr(10)
+            Final = Right(Final, Len(Final) - 1)
+            Final = Replace(Final, "You must be logged to mark this container as favourite,", ", ")
+            Final = Replace(Final, ", * , ", "")
+            results = ""
+    Next
+    
+    Cells(I, 3).Value = "Checked on: " & Date & Chr(10) & Final
+Next
+End Sub
+
+
+Sub COSCOSEARCH()
+Dim strings() As String
+I = 1
+a = 1
+
+    LINK1 = "http://elines.coscoshipping.com/NewEBWeb/public/cargoTracking/cargoTracking.xhtml?CARGO_TRACKING_NUMBER_TYPE=BILLOFLADING&CARGO_TRACKING_NUMBER="
+    LINK2 = "&REDIRECT=1&uid="
+    Dim BLNUMBER As String
+    BLNUMBER = Cells(I, 1).Value
+    
+    Dim HtmlDoc As New HTMLDocument
+    With CreateObject("MSXML2.XMLHTTP")
+         .Open "GET", LINK1 & BLNUMBER & LINK2, False
+         .Send
+    Application.Wait (Now + #12:00:05 AM#)
+         GETHTML = .responsetext
+    End With
+    HtmlDoc.body.innerHTML = GETHTML
+
+    Dim ITM As IHTMLElement
+    Set ITMCOLLECTION = HtmlDoc.getElementsByTagName("td")
+    
+    For Each ITM In HtmlDoc.getElementsByTagName("TD")
+        Cells(a, 3).Value = ITM.innerText
+        a = a + 1
+    Next
+    
+
+End Sub
+
+
+
+Sub YMSEARCH()
+Dim strings() As String
+For I = 1 To 10
+
+    LINK1 = "https://www.yangming.com/e-service/track_trace/blconnect.aspx?BLADG="
+    LINK2 = ",&rdolType=BL&type=cargo"
+    Dim BLNUMBER As String
+    BLNUMBER = Cells(I, 1).Value
+       
+    Dim HtmlDoc As New HTMLDocument
+    With CreateObject("MSXML2.XMLHTTP")
+         .Open "GET", LINK1 & BLNUMBER & LINK2, False
+         .Send
+    Application.Wait (Now + #12:00:05 AM#)
+         GETHTML = .responsetext
+    End With
+    HtmlDoc.body.innerHTML = GETHTML
+
+    
+    With HtmlDoc.getElementsByTagName("td")
+        receipt = .Item(8).innerText & ": " & .Item(12).innerText & "; "
+        loading = .Item(9).innerText & ": " & .Item(13).innerText & "; "
+        discharge = .Item(10).innerText & ": " & .Item(14).innerText & "; "
+        Delivery = .Item(11).innerText & ": " & .Item(15).innerText & "; "
+        loaded = "Loaded: " & .Item(19).innerText & "; "
+        arrival1 = .Item(20).innerText & ": " & .Item(21).innerText & ";"
+        arrival2 = .Item(22).innerText & ": " & .Item(23).innerText
+        result = receipt & loading & discharge & Delivery & loaded & arrival1 & arrival2
+    End With
+    
+    Cells(I, 2).Value = result
+Next
+End Sub
+
+
+Sub HAPAGLLOYDSEARCH()
+Dim strings() As String
+For I = 1 To 10
+
+    LINK = "https://www.hapag-lloyd.com/en/online-business/tracing/tracing-by-booking.html?blno="
+    Dim BLNUMBER As String
+    'BLNUMBER = Cells(I, 1).Value
+    BLNUMBER = "HLCUSYD170611281"
+    
+    Dim HtmlDoc As New HTMLDocument
+    With CreateObject("MSXML2.XMLHTTP")
+         .Open "GET", LINK & BLNUMBER, False
+         .Send
+    Application.Wait (Now + #12:00:05 AM#)
+         GETHTML = .responsetext
+    End With
+    HtmlDoc.body.innerHTML = GETHTML
+
+    
+    With HtmlDoc.getElementsByTagName("td")
+        receipt = .Item(8).innerText & ": " & .Item(12).innerText & "; "
+        loading = .Item(9).innerText & ": " & .Item(13).innerText & "; "
+        discharge = .Item(10).innerText & ": " & .Item(14).innerText & "; "
+        Delivery = .Item(11).innerText & ": " & .Item(15).innerText & "; "
+        loaded = "Loaded: " & .Item(19).innerText & "; "
+        arrival1 = .Item(20).innerText & ": " & .Item(21).innerText & ";"
+        arrival2 = .Item(22).innerText & ": " & .Item(23).innerText
+        result = receipt & loading & discharge & Delivery & loaded & arrival1 & arrival2
+    End With
+    
+    Cells(I, 2).Value = result
+Next
+End Sub
+
