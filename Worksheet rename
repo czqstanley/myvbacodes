@@ -1,0 +1,64 @@
+Sub ReadFileNames()
+Dim fNames()
+With Application.FileDialog(msoFileDialogFolderPicker)
+.InitialFileName = "C:\"
+.Title = "Please select file path"
+.Show
+
+fPth = .SelectedItems(1) & "\"
+FNAME = Dir(fPth)
+fCount = 0
+    Do While FNAME <> ""
+    FNAME = Dir
+    fCount = fCount + 1
+    Loop
+
+ReDim fNames(fCount)
+fCount = 0
+FNAME = Dir(.SelectedItems(1) & "\")
+    Do While FNAME <> ""
+    fNames(c) = FNAME
+    FNAME = Dir
+    c = c + 1
+    Loop
+
+End With
+
+'MsgBox ("Total Files: " & UBound(fNames))
+
+'For i = 0 To UBound(fNames)
+'    Cells(i + 1, 1).Value = fNames(i)
+'Next
+'MsgBox UBound(fNames) - 1
+    For i = 0 To UBound(fNames) - 1
+    Call LoopThrWbs1(fPth, fNames(i))
+    Next
+End Sub
+
+Sub LoopThrWbs1(fPth, FileName)
+    Workbooks.Open (fPth & FileName)
+    Set WB = Workbooks(FileName)
+    WB.Activate
+    Call LoopThrShts1
+    WB.Save
+    WB.Close
+End Sub
+
+Sub LoopThrShts1()
+For Each WS In ActiveWorkbook.Worksheets
+    With WS
+    On Error Resume Next
+    'Validate the line if a date is needed
+    'TabDate = .Cells(1, 1).Value
+    
+    'Validate the line if a string is needed
+    TabN = .Cells(3, 3).Value
+    
+    'Combine the strings
+    TabName = TabN
+    
+    'Change Name
+    .Name = TabName
+    End With
+Next
+End Sub
