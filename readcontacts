@@ -1,0 +1,65 @@
+Sub readcontacts()
+i = 1
+Dim olApp As Object
+Dim exchUser As Outlook.ExchangeUser
+
+Set olApp = GetObject(, "outlook.application")
+Set olContactsFolder = Session.getdefaultfolder(olFolderContacts)
+
+For Each CItem In olContactsFolder.Items
+    If Not CItem.Class = olDistributionList Then
+    'Cells(I, 1).Value = CItem.EntryID
+    Cells(i, 2).Value = CItem.FullName
+    Cells(i, 3).Value = CItem.FirstName
+    Cells(i, 4).Value = CItem.LastName
+        'If CItem.Email1AddressType = Outlook.OlAddressEntryUserType.olExchangeUserAddressEntry Then
+        'Set exchUser = CItem.GetExchangeUser()
+            'If Not exchUser Is Nothing Then
+            'normaladdress = exchUser.PrimarySmtpAddress
+            'End If
+        Cells(i, 5).Value = CItem.HomeAddress
+        'End If
+    i = i + 1
+    End If
+Next
+
+'ActiveSheet.AutoFit
+
+End Sub
+
+
+Sub rewritecontacts()
+i = 1
+Dim olApp As Object
+
+Set olApp = GetObject(, "outlook.application")
+Set olContactsFolder = Session.getdefaultfolder(olFolderContacts)
+
+For Each CItem In olContactsFolder.Items
+    If CItem.EntryID = Cells(i, 1).Value Then
+    CItem.FullName = Cells(i, 2).Value
+    CItem.FirstName = Cells(i, 3).Value
+    CItem.LastName = Cells(i, 4).Value
+    CItem.Save
+    i = i + 1
+    End If
+Next
+End Sub
+
+Sub readsenders()
+i = 1
+Dim olApp As Object
+Dim mynamespace As Outlook.Namespace
+
+Set MF = GetObject(, "outlook.application").Session.Folders("ARCHIVES").Folders("INBOX")
+For Each CItem In MF.Items
+    If CItem.Class = olMeeting Then
+    Cells(i, 1).Value = CItem.Sender
+    Cells(i, 3).Value = CItem.Subject
+    Cells(i, 2).Value = CItem.ReceivedTime
+    Cells(i, 4).Value = CItem.Importance
+    i = i + 1
+    Else
+    End If
+Next
+End Sub
