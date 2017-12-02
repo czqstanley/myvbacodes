@@ -1,0 +1,76 @@
+Function CreateDynamicReport(strSQL As String)
+Dim db As DAO.Database ' database object
+Dim rs As DAO.Recordset ' recordset object
+Dim fld As DAO.Field ' recordset field
+Dim txtNew As Access.TextBox ' textbox control
+Dim lblNew As Access.Label ' label control
+Dim rpt As Report ' hold report object
+Dim lngTop As Long ' holds top value of control position
+Dim lngLeft As Long ' holds left value of controls position
+Dim title As String 'holds title of report
+ 
+     'set the title
+     title = "Title for the Report"
+ 
+     ' initialise position variables
+     lngLeft = 0
+     lngTop = 0
+ 
+     'Create the report
+     Set rpt = CreateReport
+ 
+     ' set properties of the Report
+     With rpt
+         .Width = 8500
+         .RecordSource = strSQL
+         .Caption = title
+     End With
+ 
+     ' Open SQL query as a recordset
+     Set db = CurrentDb
+     Set rs = db.OpenRecordset(strSQL)
+ 
+     ' Create Label Title
+     Set lblNew = CreateReportControl(rpt.Name, acLabel, _
+     acPageHeader, , "Title", 0, 0)
+     lblNew.FontBold = True
+     lblNew.FontSize = 12
+     lblNew.SizeToFit
+ 
+     ' Create corresponding label and text box controls for each field.
+     For Each fld In rs.Fields
+ 
+         ' Create new text box control and size to fit data.
+         Set txtNew = CreateReportControl(rpt.Name, acTextBox, _
+         acDetail, , fld.Name, lngLeft + 1500, lngTop)
+         txtNew.SizeToFit
+ 
+         ' Create new label control and size to fit data.
+         Set lblNew = CreateReportControl(rpt.Name, acLabel, acDetail, _
+         txtNew.Name, fld.Name, lngLeft, lngTop, 1400, txtNew.Height)
+         lblNew.SizeToFit
+ 
+         ' Increment top value for next control
+         lngTop = lngTop + txtNew.Height + 25
+     Next
+ 
+     ' Create datestamp in Footer
+     Set lblNew = CreateReportControl(rpt.Name, acLabel, _
+     acPageFooter, , Now(), 0, 0)
+ 
+     ' Create page numbering on footer
+     Set txtNew = CreateReportControl(rpt.Name, acTextBox, _
+     acPageFooter, , "='Page ' & [Page] & ' of ' & [Pages]", rpt.Width - 1000, 0)
+     txtNew.SizeToFit
+ 
+     ' Open new report.
+     DoCmd.OpenReport rpt.Name, acViewPreview
+ 
+     'reset all objects
+     rs.Close
+     Set rs = Nothing
+     Set rpt = Nothing
+     Set db = Nothing
+ 
+End Function
+
