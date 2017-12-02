@@ -1,0 +1,72 @@
+Sub emailreport()
+Dim oApp As Outlook.Application
+Dim oEmail As Outlook.MailItem
+Dim fileName As String, todayDate As String
+
+'Export report in same folder as db with date stamp
+todayDate = Format(Date, "MMDDYYYY")
+fileName = Application.CurrentProject.Path & "\ReportName_" & todayDate & ".pdf"
+'DoCmd.OutputTo acReport, "ReportName", acFormatPDF, fileName, False
+DoCmd.OutputTo acOutputReport, "qryDummy", acFormatPDF, fileName, False
+
+'Email the results of the report generated
+Set oApp = GetObject(, "Outlook.application")
+Set oEmail = oApp.CreateItem(olMailItem)
+With oEmail
+    .Recipients.Add "ZQCHEN@BOCUSA.COM"
+    .Subject = "Training Roster"
+    .Body = "Roster Information"
+    .Attachments.Add fileName
+    .Send
+End With
+
+End Sub
+
+
+Sub CAR()
+
+Dim rptReport As Access.Report
+Dim strCaption As String
+
+    CurrentDb.QueryDefs("qryDummy").SQL = "SELECT [TF Ref], [Our Ref], [DUE DATE] FROM DUES WHERE [DUE DATE] = #12/01/2017#"
+    
+    With DoCmd
+         .OpenQuery "qryDummy", acViewNormal
+         .RunCommand acCmdNewObjectAutoReport
+         .Close acQuery, "qryDummy"
+         .RunCommand acCmdDesignView
+    End With
+
+     For Each rpt In Reports
+         If rpt.Caption = "qryDummy" Then Set rptReport = rpt
+    Next
+     
+             
+    With rptReport
+ 
+         ' Create title control
+        
+         CreateReportControl "qryDummy", acLabel, _
+        acPageFooter, , Now(), 0, 0
+         
+    End With
+    
+    
+        
+End Sub
+
+
+Sub TESTQUERY()
+Dim dbs As Database
+Set dbs = CurrentDb
+SQLTEXT = "SELECT * FROM DUES WHERE [DUE DATE] = DATE()"
+Set rs = dbs.OpenRecordset(SQLTEXT)
+Set testqr = dbs.CreateQueryDef("textq1", SQLTEXT)
+Set rst = dbs.OpenRecordset
+End Sub
+
+
+Sub Deltequery1()
+CurrentDb.QueryDefs.Delete "textq1"
+End Sub
+
