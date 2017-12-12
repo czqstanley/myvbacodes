@@ -1,0 +1,346 @@
+ Sub StoreReminders()
+    Dim appOL As Object
+     Dim objReminder As Object
+     
+    Set appOL = GetObject(, "Outlook.application")
+     Set objReminder = appOL.CreateItem(1) ' olAppointmentItem
+     objReminder.MeetingStatus = olMeeting
+     objReminder.Start = Range("a1") ' date
+     objReminder.Duration = Range("b1") ' time
+     objReminder.Subject = Range("c1") ' subject text
+     objReminder.RequiredAttendees = Range("d1") 'email
+     'objReminder.OptionalAttendees = Range("e1") 'email
+     'objReminder.Recipients.Add Cells("d1")
+     objReminder.ReminderSet = True
+           
+     objReminder.Save
+     'objReminder.Display
+     objReminder.Send
+    
+End Sub
+
+
+Sub setreminders()
+    Dim appXL As Object
+    Set appXL = GetObject("Excel.application")
+    Set sourcewb = Workbook.Open("C:\Users\ZQCHEN\Documents\Book1.xlsx")
+    wb.Activate
+    Set sourcews = Worksheets("sheet1")
+    ws.Activate
+    a = Cells(1, 1).Value
+    b = Cells(2, 1).Value
+    c = Cells(3, 1).Value
+    d = Cells(4, 1).Value
+    
+
+   Dim appOL As Object
+   Dim objReminder As Object
+     
+    Set appOL = GetObject(, "Outlook.application")
+     Set objReminder = appOL.CreateItem(1) ' olAppointmentItem
+     objReminder.MeetingStatus = olMeeting
+     objReminder.Start = a
+     objReminder.Duration = b
+     objReminder.Subject = c
+     objReminder.RequiredAttendees = d
+     'objReminder.OptionalAttendees = Range("e1") 'email
+     'objReminder.Recipients.Add Cells("d1")
+     objReminder.ReminderSet = True
+           
+     objReminder.Save
+     'objReminder.Display
+     objReminder.Send
+    
+End Sub
+
+ Sub StoreReminders1()
+    Dim appOL As Object
+     Dim objReminder As Object
+     
+    Set appOL = GetObject(, "Outlook.application")
+     Set objReminder = appOL.CreateItem(1) ' olAppointmentItem
+     objReminder.MeetingStatus = olMeeting
+     objReminder.Start = #7/24/2017#
+     objReminder.Duration = 30
+     objReminder.Subject = "Testing"
+     'objReminder.RequiredAttendees = "Chen, Zhiqiang"
+        Set Recipient1 = Recipients
+        Recipients.Add ("Chen, Zhiqiang")
+        MsgBox (Recipient1.ResolveAll)
+     'objReminder.Recipients.Add Cells("d1")
+     objReminder.ReminderSet = True
+           
+     objReminder.Save
+     'objReminder.Display
+     'objReminder.Send
+    
+End Sub
+
+
+Sub testopen()
+Dim XlApp As Object
+
+
+Set XlApp = CreateObject("Excel.Application")
+
+Dim filepath As String
+filepath = "C:\Users\ZQCHEN\Documents\Book1.xlsx"
+
+With XlApp
+    .Visible = True
+End With
+
+Set swb = XlApp.Workbooks.Open(filepath)
+swb.Activate
+Set sws = Worksheets("sheet1")
+Dim a, b, c, d
+nrow = sws.UsedRange.Rows.Count
+ReDim a(nrow), b(nrow), c(nrow), d(nrow)
+
+For i = 1 To nrow
+a(i) = Cells(i, 1).Value
+b(i) = Cells(i, 2).Value
+c(i) = Cells(i, 3).Value
+d(i) = Cells(i, 4).Value
+Next i
+
+
+swb.Close
+
+    Dim appOL As Object
+    Dim objReminder As Object
+    For j = 1 To nrow
+    Set appOL = GetObject(, "Outlook.application")
+    Set objReminder = appOL.CreateItem(1) ' olAppointmentItem
+    objReminder.MeetingStatus = olMeeting
+    objReminder.AllDayEvent = True
+    objReminder.Start = a(j)
+    objReminder.End = a(j)
+    objReminder.Duration = b(j) ' time
+    objReminder.Subject = c(j) ' subject text
+    objReminder.RequiredAttendees = d(j) 'email
+    'objReminder.OptionalAttendees = Range("e1") 'email
+    'objReminder.Recipients.Add Cells("d1")
+    objReminder.ReminderSet = True
+           
+    objReminder.Save
+    'objReminder.Display
+    objReminder.Send
+    Next j
+    
+End Sub
+
+
+Sub GetSelectedItems()
+
+ Dim myOlExp As Outlook.Explorer
+ Dim myOlSel As Outlook.Selection
+ Dim mySender As Outlook.AddressEntry
+ Dim oMail As Outlook.MailItem
+ Dim oAppt As Outlook.AppointmentItem
+ Dim oPA As Outlook.PropertyAccessor
+ Dim strSenderID As String
+ Dim myOrt As String
+ Dim user As String
+
+ Const PR_SENT_REPRESENTING_ENTRYID As String = "http://schemas.microsoft.com/mapi/proptag/0x00410102"
+
+ Set myOlExp = Application.ActiveExplorer
+ Set myOlSel = myOlExp.Selection
+
+
+ For x = 1 To myOlSel.Count
+ If myOlSel.Item(x).Class = OlObjectClass.OlMail Then
+ ' For mail item, use the SenderName property.
+ Set oMail = myOlSel.Item(x)
+
+
+ ElseIf myOlSel.Item(x).Class = OlObjectClass.olAppointment Then
+ ' For appointment item, use the Organizer property.
+ Set oAppt = myOlSel.Item(x)
+
+ Else
+
+ Set oPA = myOlSel.Item(x).PropertyAccessor
+ strSenderID = oPA.GetProperty(PR_SENT_REPRESENTING_ENTRYID)
+ Set mySender = Application.Session.GetAddressEntryFromID(strSenderID)
+
+ End If
+ Next x
+
+
+Set objConnection = CreateObject("ADODB.Connection")
+Set objCommand = CreateObject("ADODB.Command")
+
+objConnection.Open "Provider=ADsDSOObject;"
+objCommand.ActiveConnection = objConnection
+
+strDomainName = "ou=company,dc=mydc,dc=com"
+strUserCN = oMail.SenderName & ""
+
+objCommand.CommandText = "<LDAP://" & strDomainName & ">;(&"
+(objectCategory=person)(objectClass=user)(cn=" & strUserCN &
+"));samAccountName;subtree"
+
+Set objRecordSet = objCommand.Execute
+
+If Not objRecordSet.EOF Then
+
+user = objRecordSet.Fields("samAccountName")
+
+myOrt = InputBox("Destination", "Save Attachments", "\\server\home\" & user & "")
+
+
+End If
+
+objConnection.Close
+Set objRecordSet = Nothing
+Set objConnection = Nothing
+Set objCommand = Nothing
+
+'free variables
+Set MyItems = Nothing
+Set myItem = Nothing
+Set myAttachments = Nothing
+Set myAttachment = Nothing
+Set myOLApp = Nothing
+Set myOlExp = Nothing
+Set myOlSel = Nothing
+Set user = Nothing
+
+End Sub
+
+Sub ForwardEmail()
+Dim EMLS As MailItem
+Dim oMail As MailItem
+
+Set OLMAILS = Session.Folders("Archives").Folders("Inbox")
+
+For Each EMLS In OLMAILS.Items
+    
+    If EMLS.SenderEmailAddress = "donotreply@flextronics.com" Then
+    MsgBox ("YES")
+    End If
+Next
+
+Set oMail = OLMAILS.Items(1).Forward
+    oMail.Subject = OLMAILS.Items(1).Subject
+    oMail.HTMLBody = OLMAILS.Items(1).HTMLBody
+    'oMail.Attachments = olMails.Items(1).embeddeditem
+    oMail.Recipients.Add "zqchen@bocusa.com"
+    
+    For Each Atmt In OLMAILS.Items(1).Attachments
+    'save it in C:\temp
+    FileName = "C:\TempPDF\" & Atmt.FileName
+    Atmt.SaveAsFile FileName
+    'now attach it to the new message
+    Set objOutlookAttach = oMail.Attachments.Add(FileName)
+    fs.deletefile FileName, True
+    Next
+
+    'oMail.Send
+End Sub
+
+Sub Statement_Email()
+Dim myItem As Outlook.MailItem
+Dim myToBeForwarded As Outlook.MailItem
+Dim strRecipient As String
+Dim strStatementMonth As String
+Dim strThroughDate As String
+Dim strHTML As String
+
+Dim fs As Object
+Dim Atmt As Attachment
+Dim FileName As String
+
+Dim Inbox As MAPIFolder
+Dim MyItems As Items
+Dim objOutlookAttach As Outlook.Attachment
+
+Set Inbox = GetNamespace("MAPI").GetDefaultFolder(olFolderInbox)
+Set MyItems = Inbox.Items
+Set myToBeForwarded = Application.ActiveExplorer.Selection(1)
+Set fs = CreateObject("Scripting.FileSystemObject")
+
+Set myItem = Application.CreateItemFromTemplate("C:\Users\username\AppData\Roaming\Microsoft\Templates\Statement.oft")
+strHTML = myItem.HTMLBody
+
+strLastName = InputBox("Recipients Last Name?")
+strFirstName = InputBox("Recipients First Name?")
+strPrefix = InputBox("Recipients Prefix (ex. Mr., Ms., Dr.)?")
+strMatterID = InputBox("Matter Number?")
+strStatementMonth = InputBox("What is the statement date?")
+strThroughDate = InputBox("Services rendered through what date?")
+
+myItem.HTMLBody = Replace(myItem.HTMLBody, "%STATEMENTMONTH%", strStatementMonth)
+myItem.HTMLBody = Replace(myItem.HTMLBody, "%THROUGHDATE%", strThroughDate)
+myItem.HTMLBody = Replace(myItem.HTMLBody, "%RECIPIENT%", strRecipient)
+myItem.HTMLBody = Replace(myItem.HTMLBody, "%PREFIX%", strPrefix)
+myItem.HTMLBody = Replace(myItem.HTMLBody, "%LASTNAME%", strLastName)
+myItem.Subject = Replace(myItem.Subject, "%LASTNAME%", strLastName)
+myItem.Subject = Replace(myItem.Subject, "%FIRSTNAME%", strFirstName)
+myItem.Subject = Replace(myItem.Subject, "%MATTERID%", strMatterID)
+ 
+For Each Atmt In myToBeForwarded.Attachments
+    'save it in C:\temp
+    FileName = "C:\TempPDF\" & Atmt.FileName
+    Atmt.SaveAsFile FileName
+    'now attach it to the new message
+    Set objOutlookAttach = myItem.Attachments.Add(FileName)
+    fs.deletefile FileName, True
+Next
+ 
+myItem.Display
+
+End Sub
+
+Sub SaveFlexAttachments()
+Dim EMLS As Object
+
+Set OLMAILS = Session.Folders("Archives").Folders("Local")
+
+For Each EMLS In OLMAILS.Items
+
+    If TypeOf EMLS Is MailItem Then
+        If EMLS.SenderEmailAddress = "donotreply@flextronics.com" Then
+
+            For Each Atmt In EMLS.Attachments
+            'save it in folder
+            a = EMLS.ReceivedTime
+            b = Format(a, "yyyymmdd")
+            FileName = "C:\Users\ZQCHEN\Desktop\FLEX\" & b & Atmt.FileName
+            Atmt.SaveAsFile FileName
+            Next
+
+        End If
+    End If
+Next
+
+End Sub
+
+
+Sub saveattachments()
+
+Dim EMLS As Object
+Dim TARGET As MailItem
+Set OLMAILS = Session.Folders("Archives").Folders("FLEX")
+Set TARGET = OLMAILS.Items(1)
+   
+For Each Atmt In TARGET.Attachments
+    'save it in folder
+    a = TARGET.ReceivedTime
+    b = Format(a, "yyyymmdd")
+    FileName = "C:\Users\ZQCHEN\Desktop\FLEX\" & b & Atmt.FileName
+    Atmt.SaveAsFile FileName
+Next
+
+
+End Sub
+
+Sub CountFldrs()
+Set olms = Session.Folders
+For i = 1 To olms.Count
+a = olms(i).Application.Name
+MsgBox a
+Next
+End Sub
