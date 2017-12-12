@@ -1,0 +1,184 @@
+Sub CreatPT()
+Dim sws As Worksheet
+Dim tws As Worksheet
+Dim pvt As PivotTable
+Dim pvtc As PivotCache
+Dim source As Range
+Dim target As Range
+
+sName = ActiveSheet.Name
+Set sws = Worksheets(sName)
+Set source = sws.UsedRange
+
+Set tws = Worksheets.Add
+Set target = tws.Cells(3, 1)
+
+Set pvtc = ActiveWorkbook.PivotCaches.Create(SourceType:=xlDatabase, SourceData:=source)
+Set pvt = pvtc.CreatePivotTable(Tabledestination:=target, TableName:="TB1")
+
+
+With pvt.PivotFields("Book Date")
+    .Orientation = xlRowField
+End With
+
+With pvt.PivotFields("Recv/Pay")
+    .Orientation = xlRowField
+End With
+
+With pvt.PivotFields("Type")
+    .Orientation = xlPageField
+End With
+ 
+Dim pf As PivotField
+Set pf = pvt.PivotFields("Type")
+pf.EnableMultiplePageItems = True
+    For Each PivotItems In pf.PivotItems
+        Select Case PivotItems
+        Case 216
+        PivotItems.Visible = True
+        Case 206
+        PivotItems.Visible = True
+        Case Else
+        PivotItems.Visible = False
+        End Select
+    Next
+
+Set dt = pvt.PivotFields("Book Date").DataRange
+dt.Cells(1).Group Periods:=Array(False, False, False, False, True, False, True)
+
+pvt.AddDataField pvt.PivotFields("Amount"), "Total", xlSum
+pvt.AddDataField pvt.PivotFields("amount"), "Average", xlAverage
+pvt.AddDataField pvt.PivotFields("Amount"), "Max", xlMax
+pvt.AddDataField pvt.PivotFields("Amount"), "Min", xlMin
+pvt.DataBodyRange.NumberFormat = "$#,##0.00"
+pvt.AddDataField pvt.PivotFields("Amount"), "Count", xlCount
+pvt.DataFields(5).NumberFormat = "0"
+
+
+End Sub
+
+
+
+Sub ChangeShtName()
+On Error Resume Next
+ActiveSheet.Name = Cells(3, 1).Value
+End Sub
+
+Sub LoopThrShts()
+Dim WS As Worksheet
+For Each WS In ActiveWorkbook.Worksheets
+    Call ChangeShtName
+Next
+End Sub
+
+Sub LoopThrWbs(FileName)
+    WB = Workbooks.Open(FileName)
+    Call LoopThrShts
+    Workbooks(Name).Save
+    Workbooks(Name).Close
+End Sub
+
+Sub ReadFileNames()
+Dim fNames()
+FolderPath = InputBox("PLEASE COPY THE FILE PATH:") & "\"
+With Application.FileDialog(msoFileDialogFolderPicker)
+.InitialFileName = FolderPath
+
+fName = Dir(.SelectedItems(1) & "\")
+fCount = 0
+    Do While fName <> ""
+    fName = Dir
+    fCount = fCount + 1
+    Loop
+
+ReDim fNames(fCount)
+fCount = 0
+fName = Dir(.SelectedItems(1) & "\")
+    Do While fName <> ""
+    fNames(c) = fName
+    fName = Dir
+    c = c + 1
+    Loop
+
+End With
+
+'MsgBox ("Total Files: " & UBound(fNames))
+
+'For i = 0 To UBound(fNames)
+'    Cells(i + 1, 1).Value = fNames(i)
+'Next
+
+    For i = 0 To UBound(fNames)
+    'Call LoopThrWbs(fNames(i))
+    Next
+End Sub
+Sub LoopThrWbs1(FileName)
+    Workbooks.Open (FileName)
+    Call LoopThrShts(FileName)
+    Workbooks(FileName).Save
+    Workbooks(FileName).Close
+End Sub
+
+Sub WORKFILE()
+FNAMEIS = "C:\Users\ZQCHEN\Documents\1124181.xls"
+Call LoopThrWbs1(FNAMEIS)
+End Sub
+
+
+Sub WORKFILE1()
+FNAMEIS = "C:\Users\ZQCHEN\Desktop\2016 ADV PRICE.xlsx"
+Call LoopThrWbs1(FNAMEIS)
+End Sub
+
+Sub LoopThrWbs1(FileName)
+    Set WB = Workbooks.Open(FileName)
+    WB.Activate
+    Call LoopThrShts1
+    WB.Save
+    WB.Close
+End Sub
+
+Sub LoopThrShts1()
+For Each WS In ActiveWorkbook.Worksheets
+    With WS
+    On Error Resume Next
+    .Name = .Cells(2, 3).Value
+    End With
+Next
+End Sub
+
+Sub ReadFileNames()
+Dim fNames()
+FolderPath = InputBox("PLEASE COPY THE FILE PATH:") & "\"
+With Application.FileDialog(msoFileDialogFolderPicker)
+.InitialFileName = FolderPath
+
+fName = Dir(.SelectedItems(1) & "\")
+fCount = 0
+    Do While fName <> ""
+    fName = Dir
+    fCount = fCount + 1
+    Loop
+
+ReDim fNames(fCount)
+fCount = 0
+fName = Dir(.SelectedItems(1) & "\")
+    Do While fName <> ""
+    fNames(c) = fName
+    fName = Dir
+    c = c + 1
+    Loop
+
+End With
+
+'MsgBox ("Total Files: " & UBound(fNames))
+
+'For i = 0 To UBound(fNames)
+'    Cells(i + 1, 1).Value = fNames(i)
+'Next
+
+    For i = 0 To UBound(fNames)
+    'Call LoopThrWbs(fNames(i))
+    Next
+End Sub
+
