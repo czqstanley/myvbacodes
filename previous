@@ -1,0 +1,410 @@
+Sub copydata()
+
+Dim Columnnumber As Integer
+Dim original() As Variant
+Dim total As Integer
+total = 1
+Dim wBk As Workbook
+Dim C As Integer
+C = 1
+Dim sPath As String
+Dim sFname As String
+
+sPath = "C:\Users\ZQCHEN\Desktop\testing"
+
+Application.EnableEvents = False
+Application.ScreenUpdating = False
+sFname = testing
+sFname = Dir(sPath & "\" & sFname & ".xl*", vbNormal)
+Set wBk = Workbooks.Open(sFname)
+Windows(sFname).Activate
+Worksheets("SHEET1").Activate
+    
+        Do Until IsEmpty(Cells(C, 1).Value) = True
+        C = C + 1
+        Loop
+
+ReDim original(C)
+For i = 1 To C
+original(i) = Cells(i, 1).Value
+Next
+
+Dim NEWWKB As Workbook
+Dim newfilename As String
+Set NEWWKB = Workbooks.Add
+newfilename = InputBox("save as?")
+NEWWKB.SaveAs (sPath & "\" & newfilename & ".xlsx")
+Workbooks(newfilename).Activate
+Worksheets("SHEET1").Activate
+For J = 1 To C
+Cells(total, 1).Value = original(i)
+Next
+total = total + C
+
+End Sub
+
+
+
+Sub Manageworkbooks()
+    Dim sPath As String
+    Dim sFname As String
+    Dim wBk As Workbook
+    Dim wSht As Variant
+    Dim A1 As String
+    Dim A2 As String
+    Dim A3 As String
+    Dim A4 As String
+    Dim B3 As String
+    Dim B4 As Date
+    Dim a12 As String
+    Dim f12 As String
+    Dim J As Integer
+    J = 1
+    Dim k As Integer
+    k = 1
+    
+    Do Until IsEmpty(Cells(J, 1).Value) = True
+    J = J + 1
+    Loop
+    
+    J = J - 1
+    A1 = "CASE NO."
+    A2 = "SCENARIO"
+    A3 = "REVIEWER"
+    A4 = "DATE ASSIGNED"
+    B3 = InputBox("REVIEWER")
+    B4 = Date
+    a12 = "Disposition"
+    f12 = "DATE:" & Date
+    
+    BASE = InputBox("format as 1701000")
+    Dim casenumber() As String
+    ReDim casenumber(J)
+    For i = 1 To J
+    CT = BASE + i
+    casenumber(i) = "LA" & CT
+    Next
+    
+    
+    Dim FILENAMES() As Variant
+    ReDim FILENAMES(J)
+    For i = 1 To J
+    FILENAMES(i) = Cells(i, 1).Value
+    Next
+    
+    Application.EnableEvents = False
+    Application.ScreenUpdating = False
+    sPath = InputBox("filelocation")
+    ChDir sPath
+    For i = 1 To J
+    sFname = FILENAMES(i)
+    sFname = Dir(sPath & "\" & sFname & ".xl*", vbNormal)
+    Set wBk = Workbooks.Open(sFname)
+    Windows(sFname).Activate
+    Worksheets("sheet1").Activate
+        Rows("1:4").EntireRow.Insert
+        Rows("1:4").Interior.ColorIndex = 6
+        Cells(1, 1).Value = A1
+        Cells(2, 1).Value = A2
+        Cells(3, 1).Value = A3
+        Cells(4, 1).Value = A4
+        Cells(1, 2).Value = casenumber(i)
+        Cells(3, 2).Value = B3
+        Cells(4, 2).Value = B4
+        
+        Do Until IsEmpty(Cells(k, 1).Value) = True
+        k = k + 1
+        Loop
+        Cells(k + 1, 1).Value = a12
+        Cells(k + 1, 5).Value = f12
+        Rows(k + 1).Interior.ColorIndex = 6
+        Range(Cells(k + 2, 1), Cells(k + 8, 5)).Merge
+           
+   ActiveWorkbook.Save
+   ActiveWorkbook.Close
+   Next
+End Sub
+
+
+Sub TFile()
+Dim FNAMES()
+
+With Application.FileDialog(msoFileDialogFolderPicker)
+.Title = "Testing"
+.Show
+.InitialFileName = "C:\Users\ZQCHEN\Documents\"
+
+a = Dir(.SelectedItems(1) & "\")
+b = 1
+Do While a <> ""
+FNAMES(b) = a
+a = Dir
+b = b + 1
+Loop
+
+End With
+
+MsgBox FNAMES(3)
+
+End Sub
+
+Sub GetFileNames()
+Dim xRow As Long
+Dim xDirect$, xFname$, InitialFoldr$
+InitialFoldr$ = "C:\"
+With Application.FileDialog(msoFileDialogFolderPicker)
+.InitialFileName = Application.DefaultFilePath & "\"
+.Title = "Please select a folder to list Files from"
+.InitialFileName = InitialFoldr$
+.Show
+If .SelectedItems.Count <> 0 Then
+xDirect$ = .SelectedItems(1) & "\"
+xFname$ = Dir(xDirect$, 7)
+Do While xFname$ <> ""
+ActiveCell.Offset(xRow) = xFname$
+xRow = xRow + 1
+xFname$ = Dir
+Loop
+End If
+End With
+End Sub
+
+
+Sub tothisfile()
+Dim a As Integer
+Dim b As Integer
+Dim c As Integer
+Dim d As Integer
+Dim e As Integer
+e = 1
+Dim l As Integer
+Dim k As Integer
+
+Dim sFname As String
+Dim sPath As String
+Dim wbk As Workbook
+Dim nwbk As Workbook
+sPath = ThisWorkbook.Path
+
+b = InputBox("source column number")
+c = InputBox("target column number")
+
+
+'count file numbers
+d = 1
+Do Until IsEmpty(Cells(d, 1).Value) = True
+d = d + 1
+Loop
+d = d - 1
+
+
+Dim sourcenames() As String
+ReDim sourcenames(d)
+For i = 1 To d
+sourcenames(i) = Cells(i, 1).Value
+Next
+
+Application.EnableEvents = False
+Application.ScreenUpdating = False
+
+
+For l = 1 To d
+sFname = sourcenames(l)
+sPath = ThisWorkbook.Path
+ChDir sPath
+sFname = Dir(sPath & "\" & sourcenames(l) & ".xl*", vbNormal)
+Set wbk = Workbooks.Open(sFname)
+Windows(sFname).Activate
+Worksheets("sheet1").Activate
+a = 1
+Do Until IsEmpty(Cells(a, 1).Value) = True
+a = a + 1
+Loop
+a = a - 1
+
+    Dim original() As Variant
+    ReDim original(a)
+
+    For i = 1 To a
+    original(i) = Cells(i, b).Value
+    Next
+
+Windows("new microsoft excel worksheet").Activate
+Worksheets("sheet1").Activate
+
+For k = 1 To a
+Cells(e, c).Value = original(k)
+e = e + 1
+Next
+
+Windows(sFname).Activate
+Workbooks(sFname).Save
+Workbooks(sFname).Close
+
+Next
+
+
+End Sub
+
+Sub tonewfile()
+Dim a As Integer
+Dim b As Integer
+Dim c As Integer
+Dim d As Integer
+Dim e As Integer
+e = 1
+Dim l As Integer
+Dim k As Integer
+
+Dim sFname As String
+Dim sPath As String
+Dim wbk As Workbook
+Dim nwbk As Workbook
+sPath = ThisWorkbook.Path
+
+Set nwbk = Workbooks.Add
+newfilename = InputBox("save as")
+nwbk.SaveAs (sPath & "\" & newfilename & ".xlsx")
+Workbooks.Open (sPath & "\" & newfilename & ".xlsx")
+
+
+Windows("new microsoft excel worksheet").Activate
+Worksheets("sheet1").Activate
+
+b = InputBox("source column number")
+c = InputBox("target column number")
+
+
+'count file numbers
+d = 1
+Do Until IsEmpty(Cells(d, 1).Value) = True
+d = d + 1
+Loop
+d = d - 1
+
+
+Dim sourcenames() As String
+ReDim sourcenames(d)
+For i = 1 To d
+sourcenames(i) = Cells(i, 1).Value
+Next
+
+Application.EnableEvents = False
+Application.ScreenUpdating = False
+
+
+For l = 1 To d
+sFname = sourcenames(l)
+sPath = ThisWorkbook.Path
+ChDir sPath
+sFname = Dir(sPath & "\" & sourcenames(l) & ".xl*", vbNormal)
+Set wbk = Workbooks.Open(sFname)
+Windows(sFname).Activate
+Worksheets("sheet1").Activate
+a = 1
+Do Until IsEmpty(Cells(a, 1).Value) = True
+a = a + 1
+Loop
+a = a - 1
+
+    Dim original() As Variant
+    ReDim original(a)
+
+    For i = 1 To a
+    original(i) = Cells(i, b).Value
+    Next
+
+Windows(newfilename).Activate
+Worksheets("sheet1").Activate
+
+For k = 1 To a
+Cells(e, c).Value = original(k)
+e = e + 1
+Next
+
+Windows(sFname).Activate
+Workbooks(sFname).Save
+Workbooks(sFname).Close
+
+Next
+
+
+End Sub
+
+
+Sub movedataover()
+Dim a As Integer
+Dim b As Integer
+Dim c As Integer
+Dim d As Integer
+Dim e As Integer
+e = 1
+
+Dim sFname As String
+Dim sPath As String
+Dim wbk As Workbook
+Dim nwbk As Workbook
+
+Set nwbk = Workbooks.Add
+newfilename = InputBox("save as")
+nwbk.SaveAs (sPath & "\" & newfilename & ".xlsx")
+Workbooks.Open (sPath & "\" & newfilename & ".xlsx")
+
+b = InputBox("source column number")
+c = InputBox("target column number")
+
+
+'count file numbers
+d = 1
+Do Until IsEmpty(Cells(d, 1).Value) = True
+d = d + 1
+Loop
+
+
+Dim sourcenames() As String
+ReDim sourcenames(d)
+For i = 1 To d
+sourcenames(i) = Cells(i, 1).Value
+Next
+
+Application.EnableEvents = False
+Application.ScreenUpdating = False
+
+
+For l = 1 To d
+sFname = sourcenames(l)
+sPath = ThisWorkbook.Path
+ChDir sPath
+sFname = Dir(sPath & "\" & sourcenames(l) & ".xl*", vbNormal)
+Set wbk = Workbooks.Open(sFname)
+Windows(sFname).Activate
+Worksheets("sheet1").Activate
+a = 1
+Do Until IsEmpty(Cells(a, 1).Value) = True
+a = a + 1
+Loop
+
+    Dim original() As Variant
+    ReDim original(a)
+
+    For i = 1 To a
+    original(i) = Cells(i, b).Value
+    Next
+
+Windows(sPath & "\" & newfilename & ".xlsx").Activate
+Worksheets("sheet1").Activate
+
+For k = 1 To a
+Cells(e, c).Value = original(k)
+e = e + 1
+Next
+
+Windows(sFname).Activate
+Workbooks(sFname).Close
+
+Next
+
+
+End Sub
+
+
